@@ -9,7 +9,6 @@ import { signIn, useSession } from "next-auth/react";
 const Home = ({providers}) => {
     const {data: session , status} = useSession()
 
-    console.log(providers)
     if(session) {
         return (
             <div className={classes.homeContainer}>

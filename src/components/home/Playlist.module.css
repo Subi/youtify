@@ -11,10 +11,17 @@
 }
 
 .playlistHeader {
+    width: 100%;
     display: flex;
     font-size: 18px;
     padding: 25px;
     justify-content: space-between;
+}
+
+
+.playlistHeaderUserLogo {
+    border-radius: 30px;
+    margin-left: 10px;
 }
 
 
@@ -126,6 +133,7 @@
 
 .destinationButtonContainer {
     width: 100%;
+    position: sticky;
     display: flex;
     justify-content: center;
     margin-top: 50px;
@@ -133,6 +141,9 @@
 
 
 .destinationButton {
+    position: sticky;
+    align-items: flex-start;
+    top: 0px;
     width: 40%;
     border: none;
     border-radius: 30px;
