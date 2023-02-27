@@ -1,4 +1,5 @@
 import React, { useEffect , useState , useReducer } from "react";
+import Platforms from './Platforms'
 import Image from "next/image";
 import SpotifyLogo from '../../../public/assets/spotify_logo.png'
 import ArrowIcon from '../../../public/assets/right-arrow-icon.png'
@@ -6,16 +7,18 @@ import classes from './Playlist.module.css'
 
 
 
-const Playlist = ({name , session}) => {
+const Playlist = (props) => {
     const [playlists , setPlaylists] = useState([])
     const [loadSelectedPlaylist , setLoadedSelectedPlaylist] = useState([])
+    const [transferButton , setTransferButton] = useState(false)
+
 
     useEffect(() => {
         const getPlaylist = async () => {
             const response = await fetch('https://api.spotify.com/v1/me/playlists' , {
                 headers: {
                     "Accept": "application/json",
-                    "Authorization": `Bearer ${session.user.accessToken}`
+                    "Authorization": `Bearer ${props.session.user.accessToken}`
                 }
             })
             const data = await response.json()
@@ -23,7 +26,7 @@ const Playlist = ({name , session}) => {
         }
 
         getPlaylist()
-    } , [session])
+    } , [props.session])
 
 
     const createPlaylistsArr = (playlists) => {
@@ -46,14 +49,12 @@ const Playlist = ({name , session}) => {
         setPlaylists([...playlists])
     }
 
-
     const getPlaylistTracks = async (playlist , index , e) => {
         if(e.target.checked) {
-            console.log("I have been checked")
             const response =  await fetch(`${playlist.tracks.href}` ,{
             headers: {
                     "Accept": "application/json",
-                    "Authorization": `Bearer ${session.user.accessToken}`
+                    "Authorization": `Bearer ${props.session.user.accessToken}`
                 }
         })
         const data =  await response.json()
@@ -64,14 +65,26 @@ const Playlist = ({name , session}) => {
         }
     } 
 
-    console.log(loadSelectedPlaylist , "loadedplaylist")
+    const getButtonStyle = () => {
+        if(playlists.find((playlist) => playlist.isSelected != false)) {
+            return classes.activeButton
+        } else {
+            return classes.destinationButton
+        }   
+    }
+
+    if(transferButton) {
+        return (
+            <Platforms sources={props.sources} />
+        )
+    } 
 
     return (
     <div className={classes.playlistContainer}>
         <div className={classes.playlist}>
             <div className={classes.playlistHeader}>
-                <Image className={classes.playlistHeaderUserLogo} src={session.user.image} height={50} width={50}/>
-                <h3>{name} Account</h3>
+                <Image className={classes.playlistHeaderUserLogo} src={props.session.user.image} height={50} width={50}/>
+                <h3>{props.sources[0].name} Account</h3>
                 <Image src={SpotifyLogo} height={30} width={30}/>
             </div>
             <div className={classes.playlistCountContainer}>
@@ -101,7 +114,7 @@ const Playlist = ({name , session}) => {
             </div>
         </div>
     <div className={classes.destinationButtonContainer}>
-        <button className={classes.destinationButton}> Select Transfer Platform</button>
+        <button className={getButtonStyle()} onClick={() => {setTransferButton(true)}} > Select Transfer Platform</button>
     </div>
     </div>
     )

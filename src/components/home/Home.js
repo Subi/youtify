@@ -1,35 +1,70 @@
-import React from "react";
+import React, { useEffect, useRef, useState , useReducer } from "react";
 import Image from "next/image";
 import Playlist from './Playlist'
+import Platforms from './Platforms'
 import classes from '../home/Home.module.css'
-import SpotifyLogo from '../../../public/assets/spotify_logo.png'
-import YoutubeLogo from '../../../public/assets/youtube_logo.png'
 import { signIn, useSession } from "next-auth/react";
+
+
+const reducer = (state , action) => {
+    switch(action.type) {
+        case 'INITIALIZE':
+            return {sources : action.payload}
+        case 'UPDATE_SOURCE_STATE':
+            return { ...state, sources: action.payload.value}
+        case 'SET_DATA':
+            return {sources : action.payload}
+    }
+}
+
 
 const Home = ({providers}) => {
     const {data: session , status} = useSession()
+    const [state , dispatch] = useReducer(reducer , null)
 
-    if(session) {
-        return (
-            <div className={classes.homeContainer}>
-                <Playlist name={providers.spotify.name} session={session}/>
-            </div>
-        )
+    useEffect(() => {
+        let newSources = []
+        for(let provider in providers) {
+            newSources.push({
+                ...providers[provider],
+                isSelected: false,
+                isSource: false,
+                isDestination: false
+            })
+        }
+        dispatch({type: 'INITIALIZE' , payload: newSources})
+    }, [])
+
+
+
+    // const createPlatformsArr = (providers) => {
+    //     let providerArr = []
+    //     for(let provider in providers) {
+    //         providerArr.push({
+    //             ...providers[provider],
+    //             isSelected: false
+    //         })
+    //     }
+    //     setPlatforms(providerArr)
+    // }
+
+    // useEffect(() => {
+    //     createPlatformsArr(providers)
+    // }, [])
+
+
+
+    if(session != undefined) { // mess around with this
+        // return (
+        //     <div className={classes.homeContainer}>
+        //         <Playlist session={session}  sources={state.sources}/>
+        //     </div>
+        // )
     }
 
     return (
         <div className={classes.homeContainer}>
-            <h2 className={classes.platformContainerTitle}>Select Source</h2>
-            <div className={classes.platformContainer}>
-                <div className={classes.platform} onClick={() => {signIn(providers.spotify.id , 'localhost:3000')}} >
-                    <Image src={SpotifyLogo} width={100} height={100}/>
-                    <span>Spotify</span>
-                </div>
-                <div className={classes.platform}>
-                    <Image src={YoutubeLogo} width={100} height={100}/>
-                    <span>Youtube</span>
-                </div>
-            </div>
+            {state ? <Platforms sources={state.sources} dispatch={dispatch} /> : "here"}
         </div>
     )
 }

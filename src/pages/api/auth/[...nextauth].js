@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import SpotifyProvider from "next-auth/providers/spotify"
-
+import GithubProvider from 'next-auth/providers/github'
+import GoogleProvider from 'next-auth/providers/google'
 
 // const refreshAccessToken  = async (token)  => {
 //     try{
@@ -22,6 +23,13 @@ export const authOptions = {
       clientId: process.env.SPOTIFY_CLIENT_ID,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
       authorization: 'https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private'
+    }),
+    GoogleProvider({
+      id: "youtube",
+      name: "Youtube",
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: 'https://accounts.google.com/o/oauth2/auth'
     }),
     // ...add more providers here
   ],
